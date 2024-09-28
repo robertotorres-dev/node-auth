@@ -19,6 +19,10 @@ export class Server {
   }
 
   async start() {
+    // midlewares
+    this.app.use( express.json())
+    this.app.use( express.urlencoded({ extended: true }))
+
     // rergister routes
     this.app.use(this.routes);
 
