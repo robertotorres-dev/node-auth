@@ -1,13 +1,20 @@
 import { Request, Response } from 'express'
-import { AuthRepository, RegisterUserDto } from '../../domain'
+import { AuthRepository, CustomError, RegisterUserDto } from '../../domain'
 
 export class AuthController {
 
   //Dependency Injection
   constructor(
     private readonly authRepository: AuthRepository
-  ) {
+  ) { }
 
+  private handleError = (error: unknown, res: Response) => {
+    if (error instanceof CustomError) {
+      return res.status(error.statusCode).json({ error: error.message })
+    }
+
+    console.log(error);
+    return res.status(500).json({ error: 'Internal Server Error' })
   }
 
   registerUser = async (req: Request, res: Response) => {
@@ -16,7 +23,7 @@ export class AuthController {
 
     this.authRepository.register(registerUserDto!)
       .then(user => res.json(user))
-      .catch( error => res.status(500).json(error));
+      .catch(error => this.handleError(error, res));
   }
 
   loginUser = async (req: Request, res: Response) => {

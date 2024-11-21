@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { AuthController } from "./controller";
 import { AuthDatasourceImpl, AuthRepositoryImpl } from "../../infrastructure";
-import { BcryptAdapter } from "../../config";
 
 export class AuthRoutes {
 
