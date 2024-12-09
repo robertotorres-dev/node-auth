@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { AuthRepository, CustomError, RegisterUserDto } from '../../domain'
 import { JwtAdapter } from '../../config';
+import { UserModel } from '../../data/mongodb';
 
 export class AuthController {
   //Dependency Injection
@@ -26,11 +27,22 @@ export class AuthController {
 
         res.json({
           user,
-          token: await JwtAdapter.generateToken({ email: user.email })
+          token: await JwtAdapter.generateToken({ id: user.id })
         })
 
       })
       .catch(error => this.handleError(error, res));
+  }
+
+  getUsers = async (req: Request, res: Response) => {
+    UserModel.find()
+      .then(users => {
+        res.json({
+          users,
+          token: req.body.token
+        })
+      })
+      .catch(() => res.status(500).json({ error: 'Inernal Server Error' }))
   }
 
   loginUser = async (req: Request, res: Response) => {
