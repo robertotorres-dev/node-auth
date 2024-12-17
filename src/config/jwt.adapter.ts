@@ -10,11 +10,23 @@ export class JwtAdapter {
 
       // todo: genreación del seed
       jwt.sign(payload, 'SEED', { expiresIn: duration }, (err, token) => {
-        if (err) return resolve(null)
+        if (err) return resolve(null);
 
-        resolve(token!)
+        resolve(token!);
       })
     })
+  }
 
+  static validateToken<T>(token: string): Promise<T | null> {
+
+    return new Promise((resolve) => {
+
+      jwt.verify(token, 'SEED', (err, decoded) => {
+        if (err) return resolve(null);
+
+        resolve(decoded as T);
+      })
+
+    })
   }
 }
