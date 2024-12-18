@@ -1,6 +1,5 @@
 import { Request, Response } from 'express'
-import { AuthRepository, CustomError, RegisterUserDto, RegisterUserUseCase } from '../../domain'
-import { JwtAdapter } from '../../config';
+import { AuthRepository, CustomError, RegisterUserDto, RegisterUserUseCase, LoginUserDto, LoginUserUseCase } from '../../domain'
 import { UserModel } from '../../data/mongodb';
 
 export class AuthController {
@@ -28,18 +27,22 @@ export class AuthController {
       .catch(error => this.handleError(error, res));
   }
 
+  loginUser = async (req: Request, res: Response) => {
+    const [error, loginUserDto] = LoginUserDto.create(req.body);
+    if (error) return res.status(400).json({ error });
+
+    new LoginUserUseCase(this.authRepository)
+      .execute(loginUserDto!)
+      .then(data => res.json(data))
+      .catch(error => this.handleError(error, res));
+  }
+
   getUsers = async (req: Request, res: Response) => {
     UserModel.find()
       .then(users => {
-        res.json({
-          // users,
-          user: req.body.user
-        })
+        res.json(users)
       })
       .catch(() => res.status(500).json({ error: 'Inernal Server Error' }))
   }
 
-  loginUser = async (req: Request, res: Response) => {
-    res.json('login user controller');
-  }
 }

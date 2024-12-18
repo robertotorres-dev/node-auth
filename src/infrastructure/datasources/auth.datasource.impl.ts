@@ -1,6 +1,6 @@
 import { BcryptAdapter } from "../../config";
 import { UserModel } from "../../data/mongodb";
-import { AuthDatasource, CustomError, RegisterUserDto, UserEntity } from "../../domain";
+import { AuthDatasource, CustomError, RegisterUserDto, UserEntity, LoginUserDto } from "../../domain";
 import { UserMapper } from "../mappers/user.mapper";
 
 type HashFunction = (password: string) => string
@@ -13,8 +13,8 @@ export class AuthDatasourceImpl implements AuthDatasource {
   ) { }
 
 
-  async register(registerUsrDto: RegisterUserDto): Promise<UserEntity> {
-    const { email, password, name } = registerUsrDto;
+  async register(registerUserDto: RegisterUserDto): Promise<UserEntity> {
+    const { email, password, name } = registerUserDto;
 
     try {
       const exists = await UserModel.findOne({ email });
@@ -37,7 +37,29 @@ export class AuthDatasourceImpl implements AuthDatasource {
 
       throw CustomError.internalServerError()
     }
+  }
 
+  async login(loginUserDto: LoginUserDto): Promise<UserEntity> {
+    const { email, password } = loginUserDto;
+
+    try {
+      const user = await UserModel.findOne({ email });
+
+      console.log(user?.password);
+      console.log(password);
+
+      if (user && !this.comparePassword(password, user.password))
+        throw CustomError.unauthorized('Please verify your password');
+
+      return UserMapper.userEntityFromObject(user!)
+
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+
+      throw CustomError.internalServerError()
+    }
   }
 
 }
