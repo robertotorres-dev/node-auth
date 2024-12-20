@@ -1,5 +1,5 @@
 import { JwtAdapter } from "../../../config";
-import { RegisterUserDto } from "../../../domain";
+import { RegisterUserDto } from "../..";
 import { CustomError } from "../../errors/custom.error";
 import { AuthRepository } from "../../repositories/auth.repository";
 

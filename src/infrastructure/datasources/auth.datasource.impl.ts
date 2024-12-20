@@ -44,12 +44,11 @@ export class AuthDatasourceImpl implements AuthDatasource {
 
     try {
       const user = await UserModel.findOne({ email });
+      if (!user) throw CustomError.badRequest('User does not exist - email');
 
-      console.log(user?.password);
-      console.log(password);
-
-      if (user && !this.comparePassword(password, user.password))
-        throw CustomError.unauthorized('Please verify your password');
+      const isMatching = this.comparePassword(password, user.password);
+      if (!isMatching)
+        throw CustomError.badRequest('Password is not valid');
 
       return UserMapper.userEntityFromObject(user!)
 

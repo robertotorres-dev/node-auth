@@ -16,10 +16,7 @@ export class LoginUserDto {
 
     return [
       undefined,
-      new LoginUserDto(
-        email.toLowerCase(),
-        password
-      )
+      new LoginUserDto(email, password)
     ];
   }
 }
